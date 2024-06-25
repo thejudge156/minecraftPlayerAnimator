@@ -68,7 +68,7 @@ public final class KeyframeAnimation implements Supplier<UUID> {
     private KeyframeAnimation(int beginTick, int endTick, int stopTick, boolean isInfinite, int returnToTick, HashMap<String, StateCollection> bodyParts, boolean isEasingBefore, boolean nsfw, UUID uuid, AnimationFormat emoteFormat, HashMap<String, Object> extraData) {
         this.beginTick = Math.max(beginTick, 0);
         this.endTick = Math.max(beginTick + 1, endTick);
-        this.stopTick = stopTick <= endTick ? endTick + 3 : stopTick;
+        this.stopTick = endTick <= stopTick ? stopTick + 3 : endTick;
         this.isInfinite = isInfinite;
         if (isInfinite && (returnToTick < 0 || returnToTick > endTick)) throw new IllegalArgumentException("Trying to construct invalid animation");
         this.returnToTick = returnToTick;

@@ -12,6 +12,7 @@ import dev.kosmx.playerAnim.core.util.Ease;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationRegistry;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationFactory;
+import dev.kosmx.playerAnim.minecraftApi.layers.LeftHandedHelperModifier;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -45,9 +46,6 @@ public class PlayerAnimTestmod implements ClientModInitializer {
             if (player instanceof LocalPlayer) {
                 //animationStack.addAnimLayer(42, testAnimation); //Add and save the animation container for later use.
                 ModifierLayer<IAnimation> testAnimation =  new ModifierLayer<>();
-
-                testAnimation.addModifierBefore(new SpeedModifier(0.5f)); //This will be slow
-                testAnimation.addModifierBefore(new MirrorModifier(true)); //Mirror the animation
                 return testAnimation;
             }
             return null;
@@ -55,6 +53,7 @@ public class PlayerAnimTestmod implements ClientModInitializer {
 
         PlayerAnimationAccess.REGISTER_ANIMATION_EVENT.register((player, animationStack) -> {
             ModifierLayer<IAnimation> layer = new ModifierLayer<>();
+            layer.addModifierBefore(new LeftHandedHelperModifier(player));
             animationStack.addAnimLayer(69, layer);
             PlayerAnimationAccess.getPlayerAssociatedData(player).set(new ResourceLocation("testmod", "test"), layer);
         });
@@ -67,13 +66,14 @@ public class PlayerAnimTestmod implements ClientModInitializer {
         //Use this for setting an animation without fade
         //PlayerAnimTestmod.testAnimation.setAnimation(new KeyframeAnimationPlayer(AnimationRegistry.animations.get("two_handed_vertical_right_right")));
 
-        ModifierLayer<IAnimation> testAnimation;
-        if (new Random().nextBoolean()) {
-            testAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation("testmod", "animation"));
-        } else {
-            testAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation("testmod", "test"));
-        }
 
+        ModifierLayer<IAnimation> testAnimation = (ModifierLayer<IAnimation>) PlayerAnimationAccess.getPlayerAssociatedData(Minecraft.getInstance().player).get(new ResourceLocation("testmod", "test"));
+
+        testAnimation.setAnimation(new KeyframeAnimationPlayer(
+                PlayerAnimationRegistry.getAnimation(new ResourceLocation("testmod", "animation.player.clean_sweep")))
+                .setFirstPersonMode(FirstPersonMode.VANILLA)
+                .setFirstPersonConfiguration(new FirstPersonConfiguration()));
+        /*
         if (testAnimation.getAnimation() != null && new Random().nextBoolean()) {
             //It will fade out from the current animation, null as newAnimation means no animation.
             testAnimation.replaceAnimationWithFade(AbstractFadeModifier.standardFadeIn(20, Ease.LINEAR), null);
@@ -86,6 +86,7 @@ public class PlayerAnimTestmod implements ClientModInitializer {
                             .setFirstPersonConfiguration(new FirstPersonConfiguration().setShowRightArm(true).setShowLeftItem(false))
             );
         }
+         */
 
 
     }
